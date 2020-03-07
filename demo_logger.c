@@ -9,7 +9,7 @@ int main()
     }
 
     dll_Logger* log = dll_Logger_create("main");
-    dll_Logger_msg(log, "main successfully logged");
+    dll_Logger_msg(log, "Log message!");
     dll_Logger_destroy(&log);
     assert(!log);
 
