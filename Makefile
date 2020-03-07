@@ -1,12 +1,12 @@
 CC = gcc
 CFLAGS = -O2 -Wall -Werror
 
-ALL = test_logger
+ALL = demo_logger
 
 .phony: all
 all: $(ALL)
 
-test_logger: test_logger.o logger.o
+demo_logger: demo_logger.o logger.o
 
 logger.o: logger.h
 
