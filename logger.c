@@ -15,7 +15,7 @@ static FILE* m_log_file;
 
 struct dll_Logger {
 
-    const char* module;
+    const char* module_name;
 };
 
 
@@ -78,11 +78,11 @@ static void my_flush(void)
 
 
 // public
-dll_Logger* dll_Logger_create(const char* module)
+dll_Logger* dll_Logger_create(const char* module_name)
 {
     dll_Logger* new_logger = malloc(sizeof(dll_Logger));
     if (new_logger) {
-        new_logger->module = module;
+        new_logger->module_name = module_name;
     }
 
     return new_logger;
@@ -91,7 +91,8 @@ dll_Logger* dll_Logger_create(const char* module)
 
 void dll_Logger_destroy(dll_Logger** self)
 {
-    (*self)->module = NULL;
+    // Can't free this, we didn't take ownership.
+    (*self)->module_name = NULL;
     free(*self);
     *self = NULL;
 }
@@ -109,5 +110,5 @@ void dll_Logger_msg(dll_Logger* self, const char* msg)
 // private
 static void msg_impl(dll_Logger* self, const char* msg)
 {
-    fprintf(m_log_file, "%s: %s\n", self->module, msg);
+    fprintf(m_log_file, "%s: %s\n", self->module_name, msg);
 }
