@@ -30,7 +30,7 @@ static void my_flush(void);
 
 
 // instance methods
-static void dll_Logger_msg_impl(dll_Logger* self, const char* msg);
+static void msg_impl(dll_Logger* self, const char* msg);
 
 
 /**********************************************************************
@@ -100,14 +100,14 @@ void dll_Logger_destroy(dll_Logger** self)
 void dll_Logger_msg(dll_Logger* self, const char* msg)
 {
     if (m_log_file) {
-        dll_Logger_msg_impl(self, msg);
+        msg_impl(self, msg);
         my_flush();
     }
 }
 
 
 // private
-static void dll_Logger_msg_impl(dll_Logger* self, const char* msg)
+static void msg_impl(dll_Logger* self, const char* msg)
 {
     fprintf(m_log_file, "%s: %s\n", self->module, msg);
 }
