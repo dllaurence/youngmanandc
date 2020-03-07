@@ -21,7 +21,7 @@ void dll_Logger_set_file(FILE* log_file);
 FILE* dll_Logger_get_file(void);
 
 // factory
-dll_Logger* dll_Logger_create(const char* module_name);
+dll_Logger* dll_Logger_create(const char* category);
 
 // Methods
 void dll_Logger_destroy(dll_Logger** self);
