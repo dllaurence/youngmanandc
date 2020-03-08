@@ -8,7 +8,7 @@ all: $(ALL)
 
 demo_logger: demo_logger.o logger.o
 demo_ownership: demo_ownership.o logger.o
-demo_error: demo_error.o error.o
+demo_error: demo_error.o logger.o error.o
 
 logger.o: logger.h
 error.o: error.h

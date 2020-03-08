@@ -2,43 +2,46 @@
 #include <stdint.h>
 
 #include "error.h"
+#include "logger.h"
+
+
+// Can't be a const because the buffer is static
+#define BUF_SIZE 100
 
 
 // Dummy resource allocation functions
 
-dll_Error dll_get_resourceN(uint32_t n, uint32_t limit)
+dll_Error dll_get_resource(dll_Logger** o_logger, uint32_t n, uint32_t limit)
 {
     if (limit >= n) {
-        printf("Acquired resource %u\n", n);
-        return dll_Error_ok;
+
+        static char buf[BUF_SIZE+1];
+        snprintf(buf, BUF_SIZE, "resource %u", n);
+
+        dll_Logger* o_new_logger = dll_Logger_create(buf);
+        if (o_new_logger) {
+
+            *o_logger = o_new_logger;
+            printf("Acquired %s\n", buf);
+
+            return dll_Error_ok;
+        }
+
+        return dll_Error_allocation_real;
     }
 
-    printf("Failed to aquire resource %u\n", n);
+    printf("Failed to aquire %s\n", buf);
     return dll_Error_allocation;
+
 }
 
 
-dll_Error dll_get_resource1(uint32_t limit)
+void dll_release_resource(dll_Logger** o_logger)
 {
-    return dll_get_resourceN(1, limit);
-}
+    // FIXME: make accessor method
+    printf("Released %s\n", dll_Logger_get_category(*o_logger));
 
-
-dll_Error dll_get_resource2(uint32_t limit)
-{
-    return dll_get_resourceN(2, limit);
-}
-
-
-dll_Error dll_get_resource3(uint32_t limit)
-{
-    return dll_get_resourceN(3, limit);
-}
-
-
-dll_Error dll_get_resource4(uint32_t limit)
-{
-    return dll_get_resourceN(4, limit);
+    dll_Logger_destroy(o_logger);
 }
 
 
@@ -47,16 +50,20 @@ dll_Error dll_do_stuff_Dijkstra(uint32_t fail_point)
 {
     dll_Error err = dll_Error_ok;
 
-    err = dll_get_resource1(fail_point);
+    dll_Logger* o_resource1;
+    err = dll_get_resource(&o_resource1, 1, fail_point);
     if (!err) {
 
-        err = dll_get_resource2(fail_point);
+        dll_Logger* o_resource2;
+        err = dll_get_resource(&o_resource2, 2, fail_point);
         if (!err) {
 
-            err = dll_get_resource3(fail_point);
+            dll_Logger* o_resource3;
+            err = dll_get_resource(&o_resource3, 3, fail_point);
             if (!err) {
 
-                err = dll_get_resource4(fail_point);
+                dll_Logger* o_resource4;
+                err = dll_get_resource(&o_resource4, 4, fail_point);
                 if (!err) {
 
                     // Main body of function
@@ -72,16 +79,16 @@ dll_Error dll_do_stuff_Dijkstra(uint32_t fail_point)
                         printf("Committed results to output variables\n");
                     }
 
-                    printf("Released resource 4\n");
+                    dll_release_resource(&o_resource4);
                 }
 
-                printf("Released resource 3\n");
+                dll_release_resource(&o_resource3);
             }
 
-            printf("Released resource 2\n");
+            dll_release_resource(&o_resource2);
         }
 
-        printf("Released resource 1\n");
+        dll_release_resource(&o_resource1);
     }
 
     return err;
@@ -95,19 +102,23 @@ dll_Error dll_do_stuff_idiomatic(uint32_t fail_point)
 
     // Weirdly, GCC uses extra parens to indicate intentional assignment.
     // VC++ may not have a way to indicate this at all.
-    if (( err = dll_get_resource1(fail_point) )) {
+    dll_Logger* o_resource1;
+    if (( err = dll_get_resource(&o_resource1, 1, fail_point) )) {
         goto RELEASE_0;
     }
 
-    if (( err = dll_get_resource2(fail_point) )) {
+    dll_Logger* o_resource2;
+    if (( err = dll_get_resource(&o_resource2, 2, fail_point) )) {
         goto RELEASE_1;
     }
 
-    if (( err = dll_get_resource3(fail_point) )) {
+    dll_Logger* o_resource3;
+    if (( err = dll_get_resource(&o_resource3, 3, fail_point) )) {
         goto RELEASE_2;
     }
 
-    if (( err = dll_get_resource4(fail_point) )) {
+    dll_Logger* o_resource4;
+    if (( err = dll_get_resource(&o_resource4, 4, fail_point) )) {
         goto RELEASE_3;
     }
 
@@ -124,16 +135,16 @@ dll_Error dll_do_stuff_idiomatic(uint32_t fail_point)
     printf("Committed results to output variables\n");
 
 RELEASE_4:
-    printf("Released resource 4\n");
+    dll_release_resource(&o_resource4);
 
 RELEASE_3:
-    printf("Released resource 3\n");
+    dll_release_resource(&o_resource3);
 
 RELEASE_2:
-    printf("Released resource 2\n");
+    dll_release_resource(&o_resource2);
 
 RELEASE_1:
-    printf("Released resource 1\n");
+    dll_release_resource(&o_resource1);
 
 RELEASE_0:
 
