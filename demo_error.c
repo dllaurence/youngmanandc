@@ -13,10 +13,11 @@
 
 dll_Error dll_get_resource(dll_Logger** o_logger, uint32_t n, uint32_t limit)
 {
-    if (limit >= n) {
 
-        static char buf[BUF_SIZE+1];
-        snprintf(buf, BUF_SIZE, "resource %u", n);
+    static char buf[BUF_SIZE+1];
+    snprintf(buf, BUF_SIZE, "resource %u", n);
+
+    if (limit >= n) {
 
         dll_Logger* o_new_logger = dll_Logger_create(buf);
         if (o_new_logger) {
@@ -27,12 +28,12 @@ dll_Error dll_get_resource(dll_Logger** o_logger, uint32_t n, uint32_t limit)
             return dll_Error_ok;
         }
 
+        printf("***Real*** failed to aquire %s\n", buf);
         return dll_Error_allocation_real;
     }
 
-    printf("Failed to aquire %s\n", buf);
-    return dll_Error_allocation;
-
+    printf("Simulated failure to aquire %s\n", buf);
+    return dll_Error_allocation_simulated;
 }
 
 
@@ -68,8 +69,8 @@ dll_Error dll_do_stuff_Dijkstra(uint32_t fail_point)
 
                     // Main body of function
                     if (fail_point <= 5) {
-                        printf("Failed to compute results, rolling back\n");
-                        err = dll_Error_computation;
+                        printf("Simulated failure to compute results, rolling back\n");
+                        err = dll_Error_computation_simulated;
                     }
 
                     if (!err) {
@@ -124,8 +125,8 @@ dll_Error dll_do_stuff_idiomatic(uint32_t fail_point)
 
     // Main body of function
     if (fail_point <= 5) {
-        printf("Failed to compute results, rolling back\n");
-        err = dll_Error_computation;
+        printf("Simulated failure to compute results, rolling back\n");
+        err = dll_Error_computation_simulated;
         goto RELEASE_4;
     }
 
