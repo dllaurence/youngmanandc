@@ -26,6 +26,7 @@ dll_Logger* dll_Logger_create(const char* category);
 // Methods
 void dll_Logger_destroy(dll_Logger** self);
 void dll_Logger_msg(dll_Logger* self, const char* msg);
+const char* dll_Logger_get_category(const dll_Logger* self);
 
 
 // Old school

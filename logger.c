@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "logger.h"
 
@@ -15,7 +16,8 @@ static FILE* m_log_file;
 
 struct dll_Logger {
 
-    const char* category;
+    // Would be o_category after the memory section of the talk
+    char* category;
 };
 
 
@@ -78,21 +80,34 @@ static void my_flush(void)
 
 
 // public
+
+// Would return an error code after the exception part of the talk
 dll_Logger* dll_Logger_create(const char* category)
 {
     dll_Logger* new_logger = malloc(sizeof(dll_Logger));
     if (new_logger) {
-        new_logger->category = category;
+
+        char* new_category = strndup(category, 100);
+        if (new_category) {
+
+            new_logger->category = new_category;
+            return new_logger;
+        }
+
+        // If we can't copy the string, abort
+        free(new_logger);
+        new_logger = NULL;
     }
 
-    return new_logger;
+    return NULL;
 }
 
 
 void dll_Logger_destroy(dll_Logger** self)
 {
-    // Can't free this, we didn't take ownership.
+    free((*self)->category);
     (*self)->category = NULL;
+
     free(*self);
     *self = NULL;
 }
@@ -104,6 +119,12 @@ void dll_Logger_msg(dll_Logger* self, const char* msg)
         msg_impl(self, msg);
         my_flush();
     }
+}
+
+
+const char* dll_Logger_get_category(const dll_Logger* self)
+{
+    return self->category;
 }
 
 
