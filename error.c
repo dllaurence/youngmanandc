@@ -2,9 +2,15 @@
 
 
 static const char* name_list[dll_Error_num_codes] = {
+
     "OK",    // 0
+
+    // Simulated errors
     "Allocation failure",
     "Computation failure",
+
+    // Real errors
+    "Real allocation failure",
 };
 
 
