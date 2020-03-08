@@ -1,3 +1,14 @@
+# executables
+demo_logger
+demo_ownership
+demo_error
+
+# editor files
+*.swp
+
+# Libreoffice lock files
+.~lock.*
+
 # Prerequisites
 *.d
 
